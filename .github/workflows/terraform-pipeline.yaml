@@ -41,14 +41,15 @@ jobs:
       runs-on: ubuntu-latest
       if: startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/release-')
       needs: [terraform-check]
+      with:
+        name: terraform-artifacts
       steps:
         - name: Terraform plan
           env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           run: terraform plan -no-color -out=terrafo
-          with:
-              name: terraform-artifacts
+
 
   # terraform-apply:
   #     name: "Terraform Apply"
