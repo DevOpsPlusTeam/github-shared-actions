@@ -2,11 +2,12 @@ name: "Terraform shared github actions"
 
 on:
   workflow_call:
-  push:
-    branches:
-      - main
-      - release-*
-    pull_request:
+    inputs:
+      secrets:
+        AWS_ACCESS_KEY_ID:
+          required: true
+        AWS_SECRET_ACCESS_KEY:
+          required: true
 
 jobs:
   terraform-checks:
