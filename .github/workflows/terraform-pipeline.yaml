@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   terraform-checks:
-    name: "Terraform feature"
+    name: "Terraform Checks"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
