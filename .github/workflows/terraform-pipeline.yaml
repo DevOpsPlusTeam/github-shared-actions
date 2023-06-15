@@ -1,4 +1,4 @@
-name: "Terraform"
+name: "Terraform Pipeline"
 
 on:
   workflow_call:
@@ -38,7 +38,7 @@ jobs:
       - name: Terraform plan
         id: plan
         if: startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/release-')
-        run: terraform plan -no-color -out:terraform.tfplan
+        run: terraform plan -no-color -out=terraform.tfplan
 
   terraform-apply:
       name: "Terraform Apply"
