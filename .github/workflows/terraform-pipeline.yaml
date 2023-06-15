@@ -13,9 +13,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  terraform-feature:
+  terraform-checks:
     if: startsWith(github.ref, 'refs/feature-')
-    name: "Terraform feature pipeline"
+    name: "Terraform feature"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -36,7 +36,7 @@ jobs:
         id: init
         run: terraform init
 
-  terraform-master:
+  terraform-plan:
       name: Terraform Plan
       runs-on: ubuntu-latest
       if: startsWith(github.ref, 'refs/heads/master') || startsWith(github.ref, 'refs/heads/main')
@@ -52,17 +52,19 @@ jobs:
           env:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          run: terraform plan -no-color -out=terraform.tfplan
+          run: terraform plan -no-color
 
-  terraform-release:
-      name: Terraform Apply
+  terraform-apply:
+      name: Terraform
       runs-on: ubuntu-latest
+      environment:
+        name: prod
       if: startsWith(github.ref, 'refs/tags/release-')
       steps:
-        - name: Download terraform artifacts
-          uses: actions/download-artifact@v3
-          with:
-            name: terraform-artifacts
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v2
         - name: Terraform Init
           id: init
           run: terraform init
@@ -71,15 +73,8 @@ jobs:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           run: terraform plan -no-color -out=terraform.tfplan
-
-  # terraform-apply:
-  #     name: "Terraform Apply"
-  #     runs-on: ubuntu-latest
-  #     environment: "prod"
-  #     needs: [terraform-plan]
-  #     steps:
-  #     - name: Terraform apply
-  #       id: apply
-  #       if: startsWith(github.ref, 'refs/tags/release-')
-  #       run: terraform apply "terraform.tfplan"
-
+        - name: Terraform plan
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: terraform plan -no-color -out=terraform.tfplan
